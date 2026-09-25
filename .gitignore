@@ -219,3 +219,5 @@ __marimo__/
 
 # Initial data (contains personal financial data)
 init_data/
+*.db
+patrimonio.db
