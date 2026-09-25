@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: patrimonio-app-prod
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://patrimonio:password@db:5432/patrimonio
+      - API_DEBUG=False
+      - ENVIRONMENT=prod
+      - LOG_LEVEL=WARNING
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: postgres:15-alpine
+    container_name: patrimonio-db-prod
+    environment:
+      POSTGRES_DB: patrimonio
+      POSTGRES_USER: patrimonio
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U patrimonio -d patrimonio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

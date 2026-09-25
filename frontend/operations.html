@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operaciones — Patrimonia</title>
+    <link rel="stylesheet" href="/frontend/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="/frontend/index.html">📊 Patrimonia</a></div>
+        <ul class="nav-links">
+            <li><a href="/frontend/dashboard.html">Dashboard</a></li>
+            <li><a href="/frontend/accounts.html">Cuentas</a></li>
+            <li><a href="/frontend/assets.html">Activos</a></li>
+            <li><a href="/frontend/operations.html" class="active">Operaciones</a></li>
+            <li><a href="/frontend/reports.html">Reportes</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>Operaciones</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="document.getElementById('csvImport').click()">📥 Importar CSV</button>
+                <input type="file" id="csvImport" accept=".csv" style="display:none;" onchange="importCSV(event)">
+                <button class="btn btn-primary" onclick="openOperationModal()">+ Nueva Operación</button>
+            </div>
+        </div>
+
+        <table class="data-table" id="operationsTable">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Activo</th>
+                    <th>Cuenta</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Total</th>
+                    <th>Comisión</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="operationsBody">
+                <tr><td colspan="9" class="loading">Cargando...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Modal crear operación -->
+    <div class="modal-overlay" id="operationModal" style="display:none;">
+        <div class="modal" style="max-width: 560px;">
+            <h2>Nueva Operación</h2>
+            <form id="operationForm">
+                <!-- Tipo: Compra / Venta -->
+                <div class="form-group">
+                    <label>Tipo de Operación</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="opType" value="Buy" checked onchange="onOpTypeChange()"> 📈 Compra</label>
+                        <label><input type="radio" name="opType" value="Sell" onchange="onOpTypeChange()"> 📉 Venta</label>
+                    </div>
+                </div>
+
+                <!-- Activo existente o nuevo (solo compra) -->
+                <div class="form-group" id="opAssetModeGroup">
+                    <label>Activo</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="opAssetMode" value="existing" checked onchange="onOpAssetModeChange()"> Existente</label>
+                        <label><input type="radio" name="opAssetMode" value="new" onchange="onOpAssetModeChange()"> Nuevo</label>
+                    </div>
+                </div>
+
+                <!-- Seleccionar activo existente -->
+                <div class="form-group" id="opExistingAssetGroup">
+                    <label>Seleccionar Activo</label>
+                    <select id="opAsset" required onchange="onAssetSelected()"></select>
+                </div>
+
+                <!-- Datos de activo nuevo -->
+                <div id="opNewAssetFields" style="display:none;">
+                    <div class="form-group">
+                        <label>Ticker</label>
+                        <input type="text" id="opNewTicker" placeholder="AAPL, VTI, BTC-USD">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="opNewName">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select id="opNewType">
+                                <option value="Stock">Acción</option>
+                                <option value="ETF">ETF</option>
+                                <option value="Fund">Fondo</option>
+                                <option value="Crypto">Cripto</option>
+                                <option value="Other">Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Moneda</label>
+                            <select id="opNewCurrency">
+                                <option value="EUR">EUR</option>
+                                <option value="USD">USD</option>
+                                <option value="GBP">GBP</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cuenta -->
+                <div class="form-group">
+                    <label>Cuenta</label>
+                    <select id="opAccount" required></select>
+                </div>
+
+                <!-- Fecha -->
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" id="opDate" required>
+                </div>
+
+                <!-- Modo de cantidad: unidades o importe -->
+                <div class="form-group">
+                    <label>Cantidad por</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="opQtyMode" value="units" checked onchange="onOpQtyModeChange()"> Unidades</label>
+                        <label><input type="radio" name="opQtyMode" value="amount" onchange="onOpQtyModeChange()"> Importe (€)</label>
+                    </div>
+                </div>
+
+                <!-- Cantidad y precio -->
+                <div class="form-row">
+                    <div class="form-group" id="opQtyUnitsGroup">
+                        <label>Cantidad (unidades)</label>
+                        <input type="number" id="opQuantity" step="0.00000001" oninput="calcTotal()">
+                    </div>
+                    <div class="form-group" id="opQtyAmountGroup" style="display:none;">
+                        <label>Importe total (€)</label>
+                        <input type="number" id="opAmount" step="0.01" oninput="calcFromAmount()">
+                    </div>
+                    <div class="form-group">
+                        <label>Precio Unitario</label>
+                        <input type="number" id="opPrice" step="0.000001" required oninput="onPriceInput()">
+                    </div>
+                </div>
+
+                <!-- Comisión y total -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Comisión</label>
+                        <input type="number" id="opCommission" step="0.01" value="0" oninput="onCommissionInput()">
+                    </div>
+                    <div class="form-group">
+                        <label>Total</label>
+                        <input type="text" id="opTotal" readonly>
+                    </div>
+                </div>
+
+                <!-- Notas -->
+                <div class="form-group">
+                    <label>Notas (opcional)</label>
+                    <textarea id="opNotes" rows="2"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeOperationModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/app.js"></script>
+    <script>
+        loadOperations();
+    </script>
+</body>
+</html>

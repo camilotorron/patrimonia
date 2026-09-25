@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes — Patrimonia</title>
+    <link rel="stylesheet" href="/frontend/css/style.css">
+    <link rel="stylesheet" href="/frontend/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="/frontend/index.html">📊 Patrimonia</a></div>
+        <ul class="nav-links">
+            <li><a href="/frontend/dashboard.html">Dashboard</a></li>
+            <li><a href="/frontend/accounts.html">Cuentas</a></li>
+            <li><a href="/frontend/assets.html">Activos</a></li>
+            <li><a href="/frontend/operations.html">Operaciones</a></li>
+            <li><a href="/frontend/reports.html" class="active">Reportes</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <h1>Reportes y Analytics</h1>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('composition', this)">Composición</button>
+            <button class="tab" onclick="switchTab('returns', this)">Rentabilidad</button>
+            <button class="tab" onclick="switchTab('history', this)">Histórico</button>
+        </div>
+
+        <div id="tab-composition" class="tab-content">
+            <h3>Composición por Tipo de Activo</h3>
+            <canvas id="compPieChart" width="400" height="400"></canvas>
+            <table class="data-table" id="compTable">
+                <thead><tr><th>Tipo</th><th>Valor</th><th>Porcentaje</th></tr></thead>
+                <tbody id="compBody"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-returns" class="tab-content" style="display:none;">
+            <h3>Rentabilidad por Activo</h3>
+            <table class="data-table" id="returnsTable">
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Nombre</th>
+                        <th>Ganancia Realizada</th>
+                        <th>Ganancia No Realizada</th>
+                        <th>Ganancia Total</th>
+                        <th>Rentabilidad %</th>
+                    </tr>
+                </thead>
+                <tbody id="returnsBody"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-history" class="tab-content" style="display:none;">
+            <h3>Evolución del Patrimonio</h3>
+            <canvas id="historyChart" width="800" height="400"></canvas>
+        </div>
+    </main>
+
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/charts.js"></script>
+    <script src="/frontend/js/app.js"></script>
+    <script>
+        loadReports();
+    </script>
+</body>
+</html>

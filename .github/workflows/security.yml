@@ -1,0 +1,41 @@
+name: Security
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: "0 0 * * 1"  # Lunes a las 00:00
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: "1.7.1"
+          virtualenvs-create: false
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Run Bandit (security lint)
+        run: |
+          pip install bandit
+          bandit -r backend/app -ll
+
+      - name: Run pip-audit (dependency check)
+        run: |
+          pip install pip-audit
+          poetry export -f requirements.txt -o /tmp/requirements.txt
+          pip-audit -r /tmp/requirements.txt
