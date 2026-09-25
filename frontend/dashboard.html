@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Patrimonia</title>
+    <link rel="stylesheet" href="/frontend/css/style.css">
+    <link rel="stylesheet" href="/frontend/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="/frontend/index.html">📊 Patrimonia</a></div>
+        <ul class="nav-links">
+            <li><a href="/frontend/dashboard.html" class="active">Dashboard</a></li>
+            <li><a href="/frontend/accounts.html">Cuentas</a></li>
+            <li><a href="/frontend/assets.html">Activos</a></li>
+            <li><a href="/frontend/operations.html">Operaciones</a></li>
+            <li><a href="/frontend/reports.html">Reportes</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <h1>Dashboard</h1>
+
+        <div class="kpi-grid" id="kpiGrid">
+            <div class="kpi-card">
+                <span class="kpi-label">Patrimonio Total</span>
+                <span class="kpi-value" id="totalWealth">—</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">Rentabilidad Total</span>
+                <span class="kpi-value" id="totalGain">—</span>
+                <span class="kpi-sub" id="totalGainPct">—</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">Total Inversiones</span>
+                <span class="kpi-value" id="portfolioValue">—</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">Efectivo</span>
+                <span class="kpi-value" id="cashValue">—</span>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3>Patrimonio Total</h3>
+                <canvas id="wealthChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Composición por Tipo</h3>
+                <canvas id="compositionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container" style="margin-top: 1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>Evolución del Patrimonio Total</h3>
+                <select id="wealthScaleSelect" onchange="loadAllEvolutionCharts()" class="filters scale-select" style="padding:0.25rem 0.5rem; border:1px solid var(--border); border-radius:var(--r-md); font-size:0.8rem;">
+                    <option value="-1">1 semana</option>
+                    <option value="0">1 mes</option>
+                    <option value="1">6 meses</option>
+                    <option value="2">1 año</option>
+                    <option value="3">2 años</option>
+                    <option value="4">5 años</option>
+                    <option value="5" selected>Total</option>
+                </select>
+            </div>
+            <canvas id="wealthEvolutionChart" style="max-height: 350px;"></canvas>
+        </div>
+
+        <div class="chart-container" style="margin-top: 1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>Evolución de Inversiones por Tipo</h3>
+                <select class="scale-select" onchange="loadAllEvolutionCharts()" style="padding:0.25rem 0.5rem; border:1px solid var(--border); border-radius:var(--r-md); font-size:0.8rem;">
+                    <option value="-1">1 semana</option>
+                    <option value="0">1 mes</option>
+                    <option value="1">6 meses</option>
+                    <option value="2">1 año</option>
+                    <option value="3">2 años</option>
+                    <option value="4">5 años</option>
+                    <option value="5" selected>Total</option>
+                </select>
+            </div>
+            <canvas id="investmentsByTypeChart" style="max-height: 350px;"></canvas>
+        </div>
+
+        <div class="chart-container" style="margin-top: 1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>Evolución del Patrimonio por Banco</h3>
+                <select class="scale-select" onchange="loadAllEvolutionCharts()" style="padding:0.25rem 0.5rem; border:1px solid var(--border); border-radius:var(--r-md); font-size:0.8rem;">
+                    <option value="-1">1 semana</option>
+                    <option value="0">1 mes</option>
+                    <option value="1">6 meses</option>
+                    <option value="2">1 año</option>
+                    <option value="3">2 años</option>
+                    <option value="4">5 años</option>
+                    <option value="5" selected>Total</option>
+                </select>
+            </div>
+            <canvas id="wealthByBankChart" style="max-height: 350px;"></canvas>
+        </div>
+    </main>
+
+    <script src="/frontend/js/api.js?v=5"></script>
+    <script src="/frontend/js/charts.js?v=5"></script>
+    <script src="/frontend/js/app.js?v=5"></script>
+    <script>
+        loadDashboard();
+        loadAllEvolutionCharts();
+    </script>
+</body>
+</html>

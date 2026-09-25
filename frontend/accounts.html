@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuentas — Patrimonia</title>
+    <link rel="stylesheet" href="/frontend/css/style.css">
+    <link rel="stylesheet" href="/frontend/css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="/frontend/index.html">📊 Patrimonia</a></div>
+        <ul class="nav-links">
+            <li><a href="/frontend/dashboard.html">Dashboard</a></li>
+            <li><a href="/frontend/accounts.html" class="active">Cuentas</a></li>
+            <li><a href="/frontend/assets.html">Activos</a></li>
+            <li><a href="/frontend/operations.html">Operaciones</a></li>
+            <li><a href="/frontend/reports.html">Reportes</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>Cuentas</h1>
+            <button class="btn btn-primary" onclick="openAccountModal()">+ Nueva Cuenta</button>
+        </div>
+
+        <table class="data-table" id="accountsTable">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Banco</th>
+                    <th>Tipo</th>
+                    <th>Saldo</th>
+                    <th>Moneda</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="accountsBody">
+                <tr><td colspan="7" class="loading">Cargando...</td></tr>
+            </tbody>
+        </table>
+
+        <div class="page-header" style="margin-top: 2.5rem;">
+            <h2>Evolución de Saldos</h2>
+            <div class="filters">
+                <select id="scaleSelect" onchange="loadEvolution()">
+                    <option value="0">1 mes</option>
+                    <option value="1">6 meses</option>
+                    <option value="2">1 año</option>
+                    <option value="3" selected>2 años</option>
+                    <option value="4">5 años</option>
+                    <option value="5">Total</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="evolutionChart" style="max-height: 450px;"></canvas>
+        </div>
+    </main>
+
+    <!-- Modal crear/editar cuenta -->
+    <div class="modal-overlay" id="accountModal" style="display:none;">
+        <div class="modal">
+            <h2 id="accountModalTitle">Nueva Cuenta</h2>
+            <form id="accountForm">
+                <input type="hidden" id="accountId">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" id="accName" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="accType">
+                        <option value="Corriente">Corriente</option>
+                        <option value="Ahorro">Ahorro</option>
+                        <option value="Inversión">Inversión</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Banco</label>
+                    <input type="text" id="accBank" required>
+                </div>
+                <div class="form-group">
+                    <label>IBAN (opcional)</label>
+                    <input type="text" id="accIban">
+                </div>
+                <div class="form-group">
+                    <label>Moneda</label>
+                    <select id="accCurrency">
+                        <option value="EUR">EUR</option>
+                        <option value="USD">USD</option>
+                        <option value="GBP">GBP</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Saldo Inicial</label>
+                    <input type="number" id="accBalance" step="0.01" value="0">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAccountModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal actualizar saldo -->
+    <div class="modal-overlay" id="balanceModal" style="display:none;">
+        <div class="modal">
+            <h2>Actualizar Saldo</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;" id="balanceAccountName"></p>
+            <form id="balanceForm">
+                <div class="form-group">
+                    <label>Nuevo Saldo</label>
+                    <input type="number" id="newBalance" step="0.01" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeBalanceModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/charts.js"></script>
+    <script src="/frontend/js/app.js"></script>
+    <script>
+        loadAccounts();
+        loadEvolution();
+    </script>
+</body>
+</html>

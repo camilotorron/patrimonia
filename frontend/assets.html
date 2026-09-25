@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activos — Patrimonia</title>
+    <link rel="stylesheet" href="/frontend/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="/frontend/index.html">📊 Patrimonia</a></div>
+        <ul class="nav-links">
+            <li><a href="/frontend/dashboard.html">Dashboard</a></li>
+            <li><a href="/frontend/accounts.html">Cuentas</a></li>
+            <li><a href="/frontend/assets.html" class="active">Activos</a></li>
+            <li><a href="/frontend/operations.html">Operaciones</a></li>
+            <li><a href="/frontend/reports.html">Reportes</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>Activos</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="refreshAllPrices()">🔄 Actualizar Precios</button>
+                <button class="btn btn-primary" onclick="openAssetModal()">+ Nuevo Activo</button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <input type="text" id="assetSearch" placeholder="Buscar por ticker o nombre..." oninput="loadAssets()">
+            <select id="assetTypeFilter" onchange="loadAssets()">
+                <option value="">Todos</option>
+                <option value="Stock">Acciones</option>
+                <option value="ETF">ETFs</option>
+                <option value="Fund">Fondos</option>
+                <option value="Crypto">Cripto</option>
+            </select>
+        </div>
+
+        <table class="data-table" id="assetsTable">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Banco</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Valor Total</th>
+                    <th>Rentabilidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="assetsBody">
+                <tr><td colspan="9" class="loading">Cargando...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Modal crear/editar activo -->
+    <div class="modal-overlay" id="assetModal" style="display:none;">
+        <div class="modal">
+            <h2 id="assetModalTitle">Nuevo Activo</h2>
+            <form id="assetForm">
+                <input type="hidden" id="assetId">
+                <div class="form-group">
+                    <label>Ticker</label>
+                    <input type="text" id="astTicker" required placeholder="AAPL, VTI, BTC-USD">
+                </div>
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" id="astName" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="astType">
+                        <option value="Stock">Acción</option>
+                        <option value="ETF">ETF</option>
+                        <option value="Fund">Fondo</option>
+                        <option value="Crypto">Cripto</option>
+                        <option value="Other">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Moneda</label>
+                    <select id="astCurrency">
+                        <option value="EUR">EUR</option>
+                        <option value="USD">USD</option>
+                        <option value="GBP">GBP</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="astManualPrice" onchange="toggleManualPrice()">
+                        Precio manual
+                    </label>
+                </div>
+                <div class="form-group" id="manualPriceGroup" style="display:none;">
+                    <label>Precio Manual</label>
+                    <input type="number" id="astPrice" step="0.000001">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAssetModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/app.js"></script>
+    <script>
+        loadAssets();
+    </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+[tool.poetry]
+name = "patrimonia"
+version = "1.0.0"
+description = "Personal wealth management application"
+authors = ["Camilo Torrón <camilo.torron@example.com>"]
+readme = "README.md"
+license = "MIT"
+packages = [
+    { include = "app", from = "backend" },
+    { include = "app/models", from = "backend" },
+    { include = "app/schemas", from = "backend" },
+    { include = "app/repositories", from = "backend" },
+    { include = "app/services", from = "backend" },
+    { include = "app/routes", from = "backend" },
+    { include = "app/utils", from = "backend" },
+    { include = "scripts" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.1"
+uvicorn = { extras = ["standard"], version = "^0.24.0" }
+sqlalchemy = "^2.0.23"
+alembic = "^1.13.0"
+psycopg2-binary = "^2.9.9"
+pydantic = "^2.5.0"
+pydantic-settings = "^2.1.0"
+email-validator = "^2.1.0"
+yfinance = "^0.2.32"
+requests = "^2.31.0"
+python-dotenv = "^1.0.0"
+python-dateutil = "^2.8.2"
+pytz = "^2023.3"
+jinja2 = "^3.1.2"
+python-multipart = "^0.0.6"
+cachetools = "^5.3.2"
+apscheduler = "^3.10.4"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-asyncio = "^0.21.1"
+pytest-cov = "^4.1.0"
+httpx = "^0.25.2"
+ruff = "^0.1.9"
+pre-commit = "^3.6.0"
+ipython = "^8.18.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["backend/app", "backend/tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "N",    # pep8-naming
+    "S",    # bandit (security)
+    "T20",  # flake8-print
+    "RUF",  # ruff-specific rules
+]
+ignore = [
+    "S101",  # use of assert (needed in tests)
+    "S104",  # possible binding to all interfaces
+    "B008",  # function calls in default arguments (FastAPI Depends)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+"backend/app/**" = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --tb=short --cov=app --cov-report=term-missing"
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 80
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise NotImplementedError",
+]
